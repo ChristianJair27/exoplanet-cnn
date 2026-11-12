@@ -1,0 +1,37 @@
+{
+ "model": "extended",
+ "lr": 0.0001,
+ "epochs": 60,
+ "seeds": [
+  {
+   "seed": 0,
+   "best_val_auc": 0.9791866181446722,
+   "best_epoch": 26,
+   "minutes": 1.3450518767038981
+  },
+  {
+   "seed": 1,
+   "best_val_auc": 0.9816765625997572,
+   "best_epoch": 38,
+   "minutes": 1.230190928777059
+  },
+  {
+   "seed": 2,
+   "best_val_auc": 0.982634233544021,
+   "best_epoch": 28,
+   "minutes": 1.1129104216893515
+  },
+  {
+   "seed": 3,
+   "best_val_auc": 0.9822511651663156,
+   "best_epoch": 30,
+   "minutes": 1.2473945140838623
+  },
+  {
+   "seed": 4,
+   "best_val_auc": 0.9857626252952819,
+   "best_epoch": 31,
+   "minutes": 1.2298814137776692
+  }
+ ]
+}

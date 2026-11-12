@@ -1,0 +1,25 @@
+{
+ "model": "extended_noscalars",
+ "lr": 0.0001,
+ "epochs": 60,
+ "seeds": [
+  {
+   "seed": 0,
+   "best_val_auc": 0.9600331992594011,
+   "best_epoch": 23,
+   "minutes": 1.7228928764661153
+  },
+  {
+   "seed": 1,
+   "best_val_auc": 0.9664176722211582,
+   "best_epoch": 21,
+   "minutes": 1.6744047403335571
+  },
+  {
+   "seed": 2,
+   "best_val_auc": 0.9604801123667241,
+   "best_epoch": 53,
+   "minutes": 1.6500590960184733
+  }
+ ]
+}

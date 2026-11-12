@@ -1,0 +1,25 @@
+{
+ "model": "global",
+ "lr": 0.0001,
+ "epochs": 60,
+ "seeds": [
+  {
+   "seed": 0,
+   "best_val_auc": 0.964949243439954,
+   "best_epoch": 54,
+   "minutes": 0.9770801385243734
+  },
+  {
+   "seed": 1,
+   "best_val_auc": 0.9650130881695717,
+   "best_epoch": 57,
+   "minutes": 1.0807566881179809
+  },
+  {
+   "seed": 2,
+   "best_val_auc": 0.9635446593883675,
+   "best_epoch": 59,
+   "minutes": 1.4827240506807964
+  }
+ ]
+}

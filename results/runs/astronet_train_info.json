@@ -1,0 +1,37 @@
+{
+ "model": "astronet",
+ "lr": 0.0001,
+ "epochs": 60,
+ "seeds": [
+  {
+   "seed": 0,
+   "best_val_auc": 0.9806550469258764,
+   "best_epoch": 50,
+   "minutes": 1.216277527809143
+  },
+  {
+   "seed": 1,
+   "best_val_auc": 0.9572240311562281,
+   "best_epoch": 43,
+   "minutes": 1.815093954404195
+  },
+  {
+   "seed": 2,
+   "best_val_auc": 0.9696737534316542,
+   "best_epoch": 60,
+   "minutes": 1.3216944773991903
+  },
+  {
+   "seed": 3,
+   "best_val_auc": 0.9550533103492307,
+   "best_epoch": 35,
+   "minutes": 1.2332864999771118
+  },
+  {
+   "seed": 4,
+   "best_val_auc": 0.9716529400497989,
+   "best_epoch": 49,
+   "minutes": 1.1375646909077963
+  }
+ ]
+}
