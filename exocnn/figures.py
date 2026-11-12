@@ -72,10 +72,11 @@ def ablation(split="test"):
     y = np.arange(len(m))
     ax.barh(y, m.auc, color=[COLORS.get(k, FG) for k in m.index], height=0.6)
     ax.errorbar(m.auc, y, xerr=[m.auc - m.auc_lo, m.auc_hi - m.auc], fmt="none", ecolor=FG, capsize=4, lw=1)
-    for yi, (auc, r99) in enumerate(zip(m.auc, m.recall_at_p99)):
-        ax.text(min(auc, 0.995) + 0.004, yi, f"{auc:.3f}   recall@P99 {r99:.2f}", va="center", fontsize=9)
-    ax.set_yticks(y, [NAMES.get(k, k) for k in m.index])
     lo = max(0.5, float(m.auc_lo.min()) - 0.03)
+    for yi, (auc, r99) in enumerate(zip(m.auc, m.recall_at_p99)):
+        ax.text(lo + 0.002, yi, f"AUC {auc:.3f}   recall at 99 % precision {r99:.2f}", va="center",
+                fontsize=9, color=BG, fontweight="bold")
+    ax.set_yticks(y, [NAMES.get(k, k) for k in m.index])
     ax.set_xlim(lo, 1.0)
     ax.set_xlabel("ROC AUC on held-out stars (bars: 95 % bootstrap over stars)")
     ax.set_title("Ablation: what each input adds")
@@ -85,23 +86,21 @@ def ablation(split="test"):
     plt.close(fig)
 
 
-def calibration(split="test", bins=10):
+def calibration(split="test", bins=8):
     runs = _runs(split)
     fig, ax = plt.subplots(figsize=(6, 5.6))
     ax.plot([0, 1], [0, 1], ls=":", color=GRID)
-    edges = np.linspace(0, 1, bins + 1)
     for name, df in runs.items():
         if name in ("global", "local"):
             continue
-        which = np.clip(np.digitize(df.p, edges) - 1, 0, bins - 1)
-        xs, ys, ns = [], [], []
-        for b in range(bins):
-            sel = which == b
-            if sel.sum() >= 3:
-                xs.append(df.p[sel].mean()); ys.append(df.label[sel].mean()); ns.append(sel.sum())
+        # equal-count bins: the test set is small and most scores sit near 0
+        order = np.argsort(df.p.values)
+        chunks = np.array_split(order, bins)
+        xs = [df.p.values[c].mean() for c in chunks]
+        ys = [df.label.values[c].mean() for c in chunks]
         ax.plot(xs, ys, "o-", color=COLORS.get(name, FG), label=NAMES.get(name, name), ms=4)
-    ax.set(xlabel="predicted probability of planet", ylabel="observed fraction of PCs",
-           title="Reliability diagram", xlim=(0, 1), ylim=(0, 1))
+    ax.set(xlabel="mean predicted probability in the bin", ylabel="observed fraction of PCs",
+           title=f"Reliability ({bins} equal-count bins, test set)", xlim=(0, 1), ylim=(0, 1))
     ax.legend(fontsize=8.5, loc="upper left")
     fig.tight_layout()
     fig.savefig(FIG / "calibration.png", dpi=150)
@@ -125,8 +124,12 @@ def recall_vs_mes(split="test", model="extended"):
         for x, r, k in zip(mid, rec, n):
             ax.text(x, r + 0.02, str(k), color=COLORS[name], fontsize=8, ha="center")
     ax.set_xscale("log")
-    ax.set(xlabel="multiple event statistic (signal strength)", ylabel="recall of PCs at p > 0.5",
-           title="Weak signals are where planets are lost", ylim=(0, 1.08))
+    from matplotlib.ticker import FixedLocator, NullFormatter, ScalarFormatter
+    ax.xaxis.set_major_locator(FixedLocator([8, 10, 15, 20, 30, 50, 70]))
+    ax.xaxis.set_major_formatter(ScalarFormatter())
+    ax.xaxis.set_minor_formatter(NullFormatter())
+    ax.set(xlabel="multiple event statistic, MES (signal strength)", ylabel="recall of PCs at p > 0.5",
+           title="Recall of planet candidates vs signal strength (numbers: PCs per bin)", ylim=(0, 1.08))
     ax.legend(fontsize=9, loc="lower right")
     fig.tight_layout()
     fig.savefig(FIG / "recall_vs_mes.png", dpi=150)
@@ -193,8 +196,10 @@ def occlusion(window=50, step=10):
     model = build("astronet")
     model.load_state_dict(torch.load(RUNS / "astronet" / "seed0.pt", map_location="cpu"))
     model.eval()
-    pc = test[(v["label"][test] == 1) & (df.p.values > 0.9)]
-    eb = test[(v["av_training_set"][test] == "AFP") & (df.p.values < 0.2) & (v["secondary"][test].min(1) < -0.3)]
+    quiet = np.std(v["local"][test][:, :40], 1) < 0.05
+    pc = test[(v["label"][test] == 1) & (df.p.values > 0.9) & quiet]
+    eb = test[(v["av_training_set"][test] == "AFP") & (df.p.values < 0.2) & quiet
+              & (v["secondary"][test].min(1) < -0.1) & (v["secondary"][test].min(1) > -0.9)]
     picks = [(i, "planet candidate") for i in pc[:1]] + [(i, "eclipsing binary (AFP)") for i in eb[:1]]
     fig, axes = plt.subplots(len(picks), 1, figsize=(11, 3.2 * len(picks)), squeeze=False)
     for ax, (i, title) in zip(axes[:, 0], picks):

@@ -32,7 +32,7 @@ def run_all(seeds=5, epochs=60, small_seeds=3):
     (RUNS / "lr_choice.json").write_text(json.dumps(
         {"astronet": {str(k): x for k, x in s1.items()}, "extended": {str(k): x for k, x in s2.items()},
          "chosen": {"astronet": lr_astro, "extended": lr_ext}}, indent=1))
-    plan = [("astronet", lr_astro, seeds), ("extended", lr_ext, seeds), ("extended_noscalars", lr_ext, seeds),
+    plan = [("astronet", lr_astro, seeds), ("extended", lr_ext, seeds), ("extended_noscalars", lr_ext, small_seeds),
             ("global", lr_astro, small_seeds), ("local", lr_astro, small_seeds)]
     for name, lr, n in plan:
         print(f"== {name} (lr {lr:g}, {n} seeds, {epochs} epochs)", flush=True)

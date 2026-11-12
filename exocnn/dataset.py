@@ -59,10 +59,14 @@ def process_star(kepid: int, star_tces: pd.DataFrame, all_tces: pd.DataFrame) ->
     """Views for every labelled TCE of one star. ``all_tces`` holds every TCE on the star (any label)."""
     folder = LC_DIR / f"{int(kepid):09d}"
     cache = CACHE_DIR / f"{int(kepid):09d}.npz"
+    time = None
     if cache.exists():
-        z = np.load(cache)
-        time, flat = z["time"], z["flat"]
-    else:
+        try:
+            z = np.load(cache)
+            time, flat = z["time"], z["flat"]
+        except Exception:      # truncated by an interrupted run: recompute
+            time = None
+    if time is None:
         time, flux = read_kepler(folder)
         if len(time) < 100:
             return []
@@ -73,7 +77,9 @@ def process_star(kepid: int, star_tces: pd.DataFrame, all_tces: pd.DataFrame) ->
         ok = np.isfinite(flat)
         time, flat = time[ok], flat[ok]
         CACHE_DIR.mkdir(parents=True, exist_ok=True)
-        np.savez_compressed(cache, time=time.astype(np.float64), flat=flat.astype(np.float32))
+        tmp = cache.with_name(cache.stem + ".tmp.npz")
+        np.savez_compressed(tmp, time=time.astype(np.float64), flat=flat.astype(np.float32))
+        tmp.replace(cache)     # atomic: an interrupted run never leaves a truncated cache
 
     out = []
     for r in star_tces.itertuples():

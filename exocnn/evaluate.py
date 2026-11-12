@@ -79,4 +79,18 @@ def evaluate_all(split="test", runs=RUNS, out=RESULTS) -> pd.DataFrame:
     show = res[["model", "n", "n_pc", "auc", "auc_lo", "auc_hi", "seed_auc_mean", "avg_precision", "accuracy",
                 "precision", "recall", "recall_at_p90", "recall_at_p95", "recall_at_p99", "brier", "ece"]]
     print(show.to_string(index=False, float_format=lambda x: f"{x:.3f}"))
+    (out / f"metrics_{split}.md").write_text(markdown_table(res))
     return res
+
+
+def markdown_table(res: pd.DataFrame) -> str:
+    cols = ["model", "TCEs (PC)", "ROC AUC [95 % CI]", "mean single-seed AUC (sd)", "avg. precision", "accuracy",
+            "precision", "recall", "recall @ P=0.95", "recall @ P=0.99", "Brier", "ECE"]
+    lines = ["| " + " | ".join(cols) + " |", "|" + "---|" * len(cols)]
+    for r in res.itertuples():
+        lines.append(
+            f"| {r.model} | {r.n} ({r.n_pc}) | {r.auc:.3f} [{r.auc_lo:.3f}, {r.auc_hi:.3f}] | "
+            f"{r.seed_auc_mean:.3f} ({r.seed_auc_std:.3f}) | {r.avg_precision:.3f} | {r.accuracy:.3f} | "
+            f"{r.precision:.3f} | {r.recall:.3f} | {r.recall_at_p95:.3f} | {r.recall_at_p99:.3f} | "
+            f"{r.brier:.3f} | {r.ece:.3f} |")
+    return "\n".join(lines) + "\n"
