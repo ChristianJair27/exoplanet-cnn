@@ -1,0 +1,33 @@
+cff-version: 1.2.0
+message: "If you use exoplanet-cnn, please cite it and the two papers it builds on."
+title: "exoplanet-cnn: AstroNet reproduced and extended with diagnostic views on Kepler DR24"
+version: 0.1.0
+date-released: 2026-11-12
+license: MIT
+repository-code: https://github.com/ChristianJair27/exoplanet-cnn
+authors:
+  - family-names: Jair
+    given-names: Christian
+    affiliation: Kister Space
+references:
+  - type: article
+    authors:
+      - family-names: Shallue
+        given-names: Christopher J.
+      - family-names: Vanderburg
+        given-names: Andrew
+    title: "Identifying Exoplanets with Deep Learning: A Five-planet Resonant Chain around Kepler-80 and an Eighth Planet around Kepler-90"
+    journal: The Astronomical Journal
+    year: 2018
+    identifiers:
+      - type: other
+        value: "arXiv:1712.05044"
+  - type: article
+    authors:
+      - family-names: Valizadegan
+        given-names: Hamed
+    title: "ExoMiner: A Highly Accurate and Explainable Deep Learning Classifier That Validates 301 New Exoplanets"
+    journal: The Astrophysical Journal
+    identifiers:
+      - type: other
+        value: "arXiv:2111.10009"
